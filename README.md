@@ -13,5 +13,3 @@ Connect with me on [Discord](https://discord.gg/HJJqRZpH2D) for discussions and 
 These scripts are straightforward and well-explained, ready to be used in your projects.
 
 Bookmark this page! I'll be adding new stuff regularly
-
-<iframe src="https://discord.com/widget?id=1145051069630644254&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
