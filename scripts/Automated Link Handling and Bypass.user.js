@@ -8,6 +8,8 @@
 // @license      MIT
 // @match        https://justpaste.it/redirect/*/*
 // @match        https://bypass.city/bypass*
+// @downloadURL  https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
+// @updateURL    https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
 // ==/UserScript==
 
 (function() {
