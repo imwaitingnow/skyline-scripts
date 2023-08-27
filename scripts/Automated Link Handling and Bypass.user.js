@@ -7,7 +7,7 @@
 // @grant        none
 // @license      MIT
 // @match        https://justpaste.it/redirect/*/*
-// @match        https://bypass.city/*
+// @match        https://bypass.city/bypass*
 // ==/UserScript==
 
 (function() {
