@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Automated Link Handling and Bypass
+// @name         Justpaste.it and bypass.city skip wait
 // @namespace    skyline1
 // @version      0.1
 // @description  Skips redirect message on justpaste.it and opens bypassed links on bypass.city in the same tab with retries
