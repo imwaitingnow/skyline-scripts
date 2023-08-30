@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Justpaste.it and bypass.city skip wait
 // @namespace    skyline1
-// @version      1.0
+// @version      1.4
 // @description  Skips redirect message on justpaste.it and opens bypassed links on bypass.city in the same tab with retries
 // @author       skyline1
 // @match        https://bypass.city/bypass*
@@ -9,11 +9,13 @@
 // @downloadURL  https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
 // @updateURL    https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
 // @grant        none
-// @license MIT
+// @license      MIT
 // ==/UserScript==
 
 (function() {
     'use strict';
+
+    let bypassFailedTimer = null;
 
     // Function to check if a URL is an absolute link
     function isAbsoluteLink(url) {
@@ -57,6 +59,44 @@
         }
     }
 
+    // Function to update the timer display
+    function updateTimerDisplay(seconds) {
+        const timerDisplay = document.getElementById('bypassFailedTimerBox');
+        if (timerDisplay) {
+            timerDisplay.textContent = `Refreshing in ${seconds} seconds...`;
+        }
+    }
+
+    // Function to check for the "Bypass failed" text and start a timer if found
+    function checkForBypassFailedText() {
+        const bodyText = document.body.textContent;
+        const bypassFailedText = "Bypass failed";
+
+        if (bodyText.includes(bypassFailedText)) {
+            if (bypassFailedTimer === null) {
+                console.log("Bypass failed detected. Starting timer...");
+                let secondsLeft = 60; // 1 minute in seconds
+
+                bypassFailedTimer = setInterval(() => {
+                    if (secondsLeft > 0) {
+                        updateTimerDisplay(secondsLeft);
+                        secondsLeft--;
+                    } else {
+                        clearInterval(bypassFailedTimer);
+                        console.log("Timer finished. Refreshing page...");
+                        location.reload();
+                    }
+                }, 1000); // Update every 1 second
+            }
+        } else {
+            clearInterval(bypassFailedTimer);
+            bypassFailedTimer = null;
+            updateTimerDisplay(0); // Clear timer display
+        }
+
+        setTimeout(checkForBypassFailedText, 1000); // Check every 1 second
+    }
+
     // Retry opening links and clicking the element every 1 second
     function retryActions() {
         openLinks();
@@ -64,8 +104,23 @@
         setTimeout(retryActions, 1000);
     }
 
-    // Run the combined functions when the page is fully loaded
+    // Create a styled box for the timer display
+    const timerDisplayBox = document.createElement('div');
+    timerDisplayBox.id = 'bypassFailedTimerBox';
+    timerDisplayBox.style.position = 'fixed';
+    timerDisplayBox.style.bottom = '20px';
+    timerDisplayBox.style.right = '20px';
+    timerDisplayBox.style.zIndex = '9999';
+    timerDisplayBox.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    timerDisplayBox.style.color = 'white';
+    timerDisplayBox.style.padding = '10px';
+    timerDisplayBox.style.borderRadius = '5px';
+    timerDisplayBox.style.fontFamily = 'Arial, sans-serif';
+    document.body.appendChild(timerDisplayBox);
+
+    // Run the check function when the page is fully loaded
     window.addEventListener('load', () => {
+        checkForBypassFailedText();
         retryActions();
     });
 
