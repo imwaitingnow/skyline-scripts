@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         Justpaste.it and bypass.city skip wait
 // @namespace    skyline1
-// @version      1.4
+// @version      2.1
 // @description  Skips redirect message on justpaste.it and opens bypassed links on bypass.city in the same tab with retries
 // @author       skyline1
 // @match        https://bypass.city/bypass*
-// @match        https://justpaste.it/redirect/*
+// @match        https://justpaste.it/*
+// @grant        none
 // @downloadURL  https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
 // @updateURL    https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
-// @grant        none
-// @license      MIT
+// @license      GPL-3.0-or-later
 // ==/UserScript==
 
 (function() {
@@ -46,26 +46,20 @@
         }
     }
 
-    // Function to find and click on the redirect skip element
-    function clickElement() {
-        const targetClass = "redirectLink redirectLinkBold";
-        const elements = document.getElementsByClassName(targetClass);
-
-        if (elements.length > 0) {
-            elements[0].click(); // Click the first element with the specified class
-            console.log("Clicked on the element.");
-        } else {
-            console.log("Element not found.");
-        }
-    }
-
     // Function to update the timer display
     function updateTimerDisplay(seconds) {
         const timerDisplay = document.getElementById('bypassFailedTimerBox');
         if (timerDisplay) {
-            timerDisplay.textContent = `Refreshing in ${seconds} seconds...`;
+            if (seconds > 0) {
+                timerDisplay.textContent = `Refreshing in ${seconds} seconds...`;
+                timerDisplay.style.display = 'block'; // Show the display
+            } else {
+                timerDisplay.style.display = 'none'; // Hide the display
+            }
         }
     }
+
+
 
     // Function to check for the "Bypass failed" text and start a timer if found
     function checkForBypassFailedText() {
@@ -97,10 +91,18 @@
         setTimeout(checkForBypassFailedText, 1000); // Check every 1 second
     }
 
-    // Retry opening links and clicking the element every 1 second
+    // Function to replace URLs with link text
+    function replaceURLsWithLinkText() {
+        const links = document.querySelectorAll('a');
+        links.forEach(link => {
+            link.href = link.textContent;
+        });
+    }
+
+    // Retry opening links and calling functions every 1 second
     function retryActions() {
         openLinks();
-        clickElement();
+        replaceURLsWithLinkText();
         setTimeout(retryActions, 1000);
     }
 
@@ -118,10 +120,8 @@
     timerDisplayBox.style.fontFamily = 'Arial, sans-serif';
     document.body.appendChild(timerDisplayBox);
 
-    // Run the check function when the page is fully loaded
-    window.addEventListener('load', () => {
-        checkForBypassFailedText();
-        retryActions();
-    });
+    // Start functions when the page is ready
+    checkForBypassFailedText();
+    retryActions();
 
 })();
