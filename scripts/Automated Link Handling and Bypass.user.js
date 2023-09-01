@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Justpaste.it and bypass.city skip wait
 // @namespace    skyline1
-// @version      2.1
+// @version      3.0
 // @description  Skips redirect message on justpaste.it and opens bypassed links on bypass.city in the same tab with retries
 // @author       skyline1
 // @match        https://bypass.city/bypass*
@@ -9,12 +9,22 @@
 // @grant        none
 // @downloadURL  https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
 // @updateURL    https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
-// @license      GPL-3.0-or-later
 // ==/UserScript==
 
 (function() {
     'use strict';
-
+    // Modify link text for all links with extra spaces in the URL
+    window.addEventListener('load', function() {
+        const links = document.querySelectorAll('a[href*="justpaste.it"][target="_blank"][rel="nofollow"]');
+        links.forEach(function(link) {
+            const hrefParts = link.href.split("justpaste.it");
+            if (hrefParts.length > 2) {
+                // Remove everything before the second "justpaste.it" occurrence
+                link.href = "https://justpaste.it" + hrefParts.slice(-1);
+                link.textContent = "https://justpaste.it" + hrefParts.slice(-1);
+            }
+        });
+    });
     let bypassFailedTimer = null;
 
     // Function to check if a URL is an absolute link
@@ -69,7 +79,7 @@
         if (bodyText.includes(bypassFailedText)) {
             if (bypassFailedTimer === null) {
                 console.log("Bypass failed detected. Starting timer...");
-                let secondsLeft = 60; // 1 minute in seconds
+                let secondsLeft = 30; // 30 seconds
 
                 bypassFailedTimer = setInterval(() => {
                     if (secondsLeft > 0) {
