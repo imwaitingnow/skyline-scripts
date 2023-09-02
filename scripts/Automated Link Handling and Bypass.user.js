@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Justpaste.it and bypass.city skip wait
 // @namespace    skyline1
-// @version      3.2
+// @version      3.3
 // @description  Skips redirect message on justpaste.it and opens bypassed links on bypass.city in the same tab with retries
 // @author       skyline1
 // @match        https://bypass.city/bypass*
@@ -11,24 +11,24 @@
 // @updateURL    https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
 // @licence      GPL-3.0-or-later
 // ==/UserScript==
+
 (function() {
     'use strict';
+    // Modify link text for all links with extra spaces in the URL
+    function clickLinkByClass() {
+        const link = document.querySelector('.redirectLink.redirectLinkBold');
+        if (link) {
+            link.click();
+        } else {
+            console.log("Link with the specified class not found.");
+        }
+    }
+
+// Call the function to click the link with the specified class
+    clickLinkByClass();
 
     let bypassFailedTimer = null;
-    let hasClickedTargetBlankLink = false;
 
-    // Modify link text for all links with extra spaces in the URL
-    window.addEventListener('load', function() {
-        const links = document.querySelectorAll('a[href*="justpaste.it"][target="_blank"][rel="nofollow"]');
-        links.forEach(function(link) {
-            const hrefParts = link.href.split("justpaste.it");
-            if (hrefParts.length > 2) {
-                // Remove everything before the second "justpaste.it" occurrence
-                link.href = "https://justpaste.it" + hrefParts.slice(-1);
-                link.textContent = "https://justpaste.it" + hrefParts.slice(-1);
-            }
-        });
-    });
     // Function to check if a URL is an absolute link
     function isAbsoluteLink(url) {
         return url.startsWith("http://") || url.startsWith("https://");
@@ -41,12 +41,13 @@
 
     // Function to find and open links with rel="noopener noreferrer"
     function openLinks() {
-        const allLinks = document.querySelectorAll('a[target="_blank"][rel*="noopener noreferrer"]');
+        const allLinks = document.querySelectorAll('a');
         let openedLink = false;
 
         allLinks.forEach(link => {
             const linkHref = link.getAttribute('href');
-            if (linkHref) {
+            const linkRel = link.getAttribute('rel');
+            if (linkHref && isAbsoluteLink(linkHref) && linkRel && linkRel.includes('noopener') && linkRel.includes('noreferrer') && !openedLink) {
                 openLinkInSameTab(linkHref);
                 openedLink = true;
             }
@@ -56,7 +57,6 @@
             setTimeout(openLinks, 1000); // Retry after 1 second
         }
     }
-
 
     // Function to update the timer display
     function updateTimerDisplay(seconds) {
@@ -70,6 +70,8 @@
             }
         }
     }
+
+
 
     // Function to check for the "Bypass failed" text and start a timer if found
     function checkForBypassFailedText() {
@@ -106,11 +108,12 @@
         const links = document.querySelectorAll('a');
         links.forEach(link => {
             const linkText = link.textContent.trim();
-            if (linkText && isAbsoluteLink(linkText)) {
+            if (linkText.startsWith('https://') || linkText.startsWith('http://')) {
                 link.href = linkText;
             }
         });
     }
+
 
     // Retry opening links and calling functions every 1 second
     function retryActions() {
@@ -133,24 +136,8 @@
     timerDisplayBox.style.fontFamily = 'Arial, sans-serif';
     document.body.appendChild(timerDisplayBox);
 
-    // Add your code snippet here
-    // Function to find and click on links with target="_blank" and rel="noopener noreferrer"
-    function clickTargetBlankLinks() {
-        if (!hasClickedTargetBlankLink) {
-            const targetBlankLinks = document.querySelectorAll('a[target="_blank"][rel="noopener noreferrer"]');
-
-            if (targetBlankLinks.length > 0) {
-                const link = targetBlankLinks[0];
-                link.click(); // Click the first link with target="_blank" and rel="noopener noreferrer"
-                console.log("Clicked on the link with target='_blank' and rel='noopener noreferrer'.");
-                hasClickedTargetBlankLink = true; // Mark that a link has been clicked
-            } else {
-                console.log("No links with target='_blank' and rel='noopener noreferrer' found.");
-            }
-        }
-    }
-
-    // Start the retry process for target="_blank" links
-    setInterval(clickTargetBlankLinks, 1000);
+    // Start functions when the page is ready
+    checkForBypassFailedText();
+    retryActions();
 
 })();
