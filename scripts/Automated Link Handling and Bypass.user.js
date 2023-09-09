@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Justpaste.it and bypass.city skip wait
 // @namespace    skyline1
-// @version      3.3
+// @version      3.4
 // @description  Skips redirect message on justpaste.it and opens bypassed links on bypass.city in the same tab with retries
 // @author       skyline1
 // @match        https://bypass.city/bypass*
@@ -12,6 +12,7 @@
 // @licence      GPL-3.0-or-later
 // ==/UserScript==
 
+// noinspection JSUnusedLocalSymbols
 (function() {
     'use strict';
     // Modify link text for all links with extra spaces in the URL
@@ -76,11 +77,15 @@
     // Function to check for the "Bypass failed" text and start a timer if found
     function checkForBypassFailedText() {
         const bodyText = document.body.textContent;
-        const bypassFailedText = "Bypass failed";
+        // noinspection JSUnusedLocalSymbols
+        const errorText = "An error has occurred.";
+        // noinspection JSUnusedLocalSymbols
+        const additionalText = "However...";
+        const bypassFailedTextRegex = /bypass failed|an error has occurred|however\.\.\./i; // Using a case-insensitive regular expression
 
-        if (bodyText.includes(bypassFailedText)) {
+        if (bypassFailedTextRegex.test(bodyText)) {
             if (bypassFailedTimer === null) {
-                console.log("Bypass failed detected. Starting timer...");
+                console.log("Bypass failed, error, or 'However...' detected. Starting timer...");
                 let secondsLeft = 30; // 30 seconds
 
                 bypassFailedTimer = setInterval(() => {
@@ -102,6 +107,9 @@
 
         setTimeout(checkForBypassFailedText, 1000); // Check every 1 second
     }
+
+
+
 
     // Function to replace URLs with link text
     function replaceURLsWithLinkText() {
