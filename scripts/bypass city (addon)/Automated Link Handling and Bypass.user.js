@@ -7,8 +7,8 @@
 // @match        https://bypass.city/bypass*
 // @match        https://justpaste.it/*
 // @grant        none
-// @downloadURL  https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
-// @updateURL    https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
+// @downloadURL  https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/bypass%20city%20(addon)/Automated%20Link%20Handling%20and%20Bypass.user.js
+// @updateURL    https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/bypass%20city%20(addon)/Automated%20Link%20Handling%20and%20Bypass.user.js
 // @licence      GPL-3.0-or-later
 // ==/UserScript==
 
