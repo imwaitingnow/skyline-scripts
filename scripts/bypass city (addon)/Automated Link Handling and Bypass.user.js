@@ -86,7 +86,7 @@
         if (bypassFailedTextRegex.test(bodyText)) {
             if (bypassFailedTimer === null) {
                 console.log("Bypass failed, error, or 'However...' detected. Starting timer...");
-                let secondsLeft = 30; // 30 seconds
+                let secondsLeft = 4; // 4 seconds
 
                 bypassFailedTimer = setInterval(() => {
                     if (secondsLeft > 0) {
