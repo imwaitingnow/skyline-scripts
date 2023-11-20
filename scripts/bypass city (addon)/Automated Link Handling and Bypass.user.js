@@ -1,21 +1,20 @@
 // ==UserScript==
 // @name         Justpaste.it and bypass.city skip wait
 // @namespace    skyline1
-// @version      3.5
+// @version      3.6
 // @description  Skips redirect message on justpaste.it and opens bypassed links on bypass.city in the same tab with retries
 // @author       skyline1
 // @match        https://bypass.city/bypass*
 // @match        https://justpaste.it/*
 // @grant        none
-// @downloadURL  https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/bypass%20city%20(addon)/Automated%20Link%20Handling%20and%20Bypass.user.js
-// @updateURL    https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/bypass%20city%20(addon)/Automated%20Link%20Handling%20and%20Bypass.user.js
+// @downloadURL  https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
+// @updateURL    https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
 // @licence      GPL-3.0-or-later
 // ==/UserScript==
 
-// noinspection JSUnusedLocalSymbols
 (function() {
     'use strict';
-    // Modify link text for all links with extra spaces in the URL
+
     function clickLinkByClass() {
         const link = document.querySelector('.redirectLink.redirectLinkBold');
         if (link) {
@@ -25,32 +24,41 @@
         }
     }
 
-// Call the function to click the link with the specified class
     clickLinkByClass();
 
     let bypassFailedTimer = null;
+    let linkClicked = false; // Track whether a link has been clicked
 
-    // Function to check if a URL is an absolute link
     function isAbsoluteLink(url) {
         return url.startsWith("http://") || url.startsWith("https://");
     }
 
-    // Function to open link in the same tab
     function openLinkInSameTab(url) {
         window.location.href = url;
     }
 
-    // Function to find and open links with rel="noopener noreferrer"
     function openLinks() {
+        if (linkClicked) {
+            return; // Do nothing if the link has already been clicked
+        }
+
         const allLinks = document.querySelectorAll('a');
         let openedLink = false;
+
+        const forbiddenWords = ["Extracted Paste", "We managed"];
 
         allLinks.forEach(link => {
             const linkHref = link.getAttribute('href');
             const linkRel = link.getAttribute('rel');
+
             if (linkHref && isAbsoluteLink(linkHref) && linkRel && linkRel.includes('noopener') && linkRel.includes('noreferrer') && !openedLink) {
-                openLinkInSameTab(linkHref);
-                openedLink = true;
+                if (!forbiddenWords.some(word => document.body.textContent.includes(word))) {
+                    openLinkInSameTab(linkHref);
+                    openedLink = true;
+                    linkClicked = true; // Set the flag to true after clicking the link
+                } else {
+                    console.log("Forbidden words found on the page. Not opening the link.");
+                }
             }
         });
 
@@ -59,34 +67,26 @@
         }
     }
 
-    // Function to update the timer display
     function updateTimerDisplay(seconds) {
         const timerDisplay = document.getElementById('bypassFailedTimerBox');
         if (timerDisplay) {
             if (seconds > 0) {
                 timerDisplay.textContent = `Refreshing in ${seconds} seconds...`;
-                timerDisplay.style.display = 'block'; // Show the display
+                timerDisplay.style.display = 'block';
             } else {
-                timerDisplay.style.display = 'none'; // Hide the display
+                timerDisplay.style.display = 'none';
             }
         }
     }
 
-
-
-    // Function to check for the "Bypass failed" text and start a timer if found
     function checkForBypassFailedText() {
         const bodyText = document.body.textContent;
-        // noinspection JSUnusedLocalSymbols
-        const errorText = "An error has occurred.";
-        // noinspection JSUnusedLocalSymbols
-        const additionalText = "However...";
-        const bypassFailedTextRegex = /bypass failed|an error has occurred|however\.\.\./i; // Using a case-insensitive regular expression
+        const bypassFailedTextRegex = /bypass failed|an error has occurred|however\.\.\./i;
 
         if (bypassFailedTextRegex.test(bodyText)) {
             if (bypassFailedTimer === null) {
                 console.log("Bypass failed, error, or 'However...' detected. Starting timer...");
-                let secondsLeft = 4; // 4 seconds
+                let secondsLeft = 4;
 
                 bypassFailedTimer = setInterval(() => {
                     if (secondsLeft > 0) {
@@ -97,21 +97,17 @@
                         console.log("Timer finished. Refreshing page...");
                         location.reload();
                     }
-                }, 1000); // Update every 1 second
+                }, 1000);
             }
         } else {
             clearInterval(bypassFailedTimer);
             bypassFailedTimer = null;
-            updateTimerDisplay(0); // Clear timer display
+            updateTimerDisplay(0);
         }
 
-        setTimeout(checkForBypassFailedText, 1000); // Check every 1 second
+        setTimeout(checkForBypassFailedText, 1000);
     }
 
-
-
-
-    // Function to replace URLs with link text
     function replaceURLsWithLinkText() {
         const links = document.querySelectorAll('a');
         links.forEach(link => {
@@ -122,15 +118,12 @@
         });
     }
 
-
-    // Retry opening links and calling functions every 1 second
     function retryActions() {
         openLinks();
         replaceURLsWithLinkText();
         setTimeout(retryActions, 1000);
     }
 
-    // Create a styled box for the timer display
     const timerDisplayBox = document.createElement('div');
     timerDisplayBox.id = 'bypassFailedTimerBox';
     timerDisplayBox.style.position = 'fixed';
@@ -144,7 +137,6 @@
     timerDisplayBox.style.fontFamily = 'Arial, sans-serif';
     document.body.appendChild(timerDisplayBox);
 
-    // Start functions when the page is ready
     checkForBypassFailedText();
     retryActions();
 
