@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         Justpaste.it and bypass.city skip wait
+// @name         Justpaste.it and bypass.city skip wait test
 // @namespace    skyline1
-// @version      3.6
+// @version      3.7
 // @description  Skips redirect message on justpaste.it and opens bypassed links on bypass.city in the same tab with retries
 // @author       skyline1
-// @match        https://bypass.city/bypass*
+// @match        https://bypass.city/*
 // @match        https://justpaste.it/*
 // @grant        none
 // @downloadURL  https://github.com/imwaitingnow/skyline-scripts/raw/main/scripts/Automated%20Link%20Handling%20and%20Bypass.user.js
@@ -14,6 +14,8 @@
 
 (function() {
     'use strict';
+
+    let currentUrl = window.location.href;
 
     function clickLinkByClass() {
         const link = document.querySelector('.redirectLink.redirectLinkBold');
@@ -27,7 +29,7 @@
     clickLinkByClass();
 
     let bypassFailedTimer = null;
-    let linkClicked = false; // Track whether a link has been clicked
+    let linkClicked = false;
 
     function isAbsoluteLink(url) {
         return url.startsWith("http://") || url.startsWith("https://");
@@ -39,13 +41,13 @@
 
     function openLinks() {
         if (linkClicked) {
-            return; // Do nothing if the link has already been clicked
+            return;
         }
 
         const allLinks = document.querySelectorAll('a');
         let openedLink = false;
 
-        const forbiddenWords = ["Extracted Paste", "We managed"];
+        const forbiddenWords = ["word1", "word2", "word3"];
 
         allLinks.forEach(link => {
             const linkHref = link.getAttribute('href');
@@ -55,7 +57,7 @@
                 if (!forbiddenWords.some(word => document.body.textContent.includes(word))) {
                     openLinkInSameTab(linkHref);
                     openedLink = true;
-                    linkClicked = true; // Set the flag to true after clicking the link
+                    linkClicked = true;
                 } else {
                     console.log("Forbidden words found on the page. Not opening the link.");
                 }
@@ -63,7 +65,7 @@
         });
 
         if (!openedLink) {
-            setTimeout(openLinks, 1000); // Retry after 1 second
+            setTimeout(openLinks, 1000);
         }
     }
 
@@ -71,7 +73,37 @@
         const timerDisplay = document.getElementById('bypassFailedTimerBox');
         if (timerDisplay) {
             if (seconds > 0) {
-                timerDisplay.textContent = `Refreshing in ${seconds} seconds...`;
+                timerDisplay.innerHTML = `Refreshing in ${seconds} seconds. <br>`;
+
+                // Create GitHub link element
+                const githubLink = document.createElement('a');
+                githubLink.href = 'https://github.com/imwaitingnow/skyline-scripts';
+                githubLink.textContent = 'GitHub';
+                githubLink.style.color = 'white'; // Set link color
+                githubLink.style.textDecoration = 'underline'; // Add underline for better visibility
+
+                // Create Discord link element
+                const discordLink = document.createElement('a');
+                discordLink.href = 'https://discord.gg/qeUSZnxfJg';
+                discordLink.textContent = 'Discord';
+                discordLink.style.color = 'white'; // Set link color
+                discordLink.style.textDecoration = 'underline'; // Add underline for better visibility
+
+                // Create Greasy Fork link element
+                const greasyForkLink = document.createElement('a');
+                greasyForkLink.href = 'https://greasyfork.org/en/users/1102006-skyline1';
+                greasyForkLink.textContent = 'Greasy Fork';
+                greasyForkLink.style.color = 'white'; // Set link color
+                greasyForkLink.style.textDecoration = 'underline'; // Add underline for better visibility
+
+                // Append links and support message to the timerDisplay
+                timerDisplay.appendChild(document.createTextNode('If you need support, you can reach me on '));
+                timerDisplay.appendChild(githubLink);
+                timerDisplay.appendChild(document.createTextNode(', '));
+                timerDisplay.appendChild(discordLink);
+                timerDisplay.appendChild(document.createTextNode(', or check out my scripts on '));
+                timerDisplay.appendChild(greasyForkLink);
+
                 timerDisplay.style.display = 'block';
             } else {
                 timerDisplay.style.display = 'none';
@@ -119,6 +151,13 @@
     }
 
     function retryActions() {
+        // Check if the URL has changed
+        if (currentUrl !== window.location.href) {
+            currentUrl = window.location.href;
+            linkClicked = false; // Reset the flag when the URL changes
+            clickLinkByClass();
+        }
+
         openLinks();
         replaceURLsWithLinkText();
         setTimeout(retryActions, 1000);
@@ -130,12 +169,14 @@
     timerDisplayBox.style.bottom = '20px';
     timerDisplayBox.style.right = '20px';
     timerDisplayBox.style.zIndex = '9999';
-    timerDisplayBox.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    timerDisplayBox.style.background = 'linear-gradient(135deg, #3498db, #ff6b6b)'; // Metallic blue to pink gradient
     timerDisplayBox.style.color = 'white';
     timerDisplayBox.style.padding = '10px';
-    timerDisplayBox.style.borderRadius = '5px';
+    timerDisplayBox.style.borderRadius = '15px'; // Increased border radius for curved edges
     timerDisplayBox.style.fontFamily = 'Arial, sans-serif';
     document.body.appendChild(timerDisplayBox);
+
+
 
     checkForBypassFailedText();
     retryActions();
