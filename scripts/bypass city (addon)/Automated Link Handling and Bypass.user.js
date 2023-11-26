@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Justpaste.it and bypass.city skip wait test
+// @name         Justpaste.it and bypass.city skip wait
 // @namespace    skyline1
 // @version      3.7
 // @description  Skips redirect message on justpaste.it and opens bypassed links on bypass.city in the same tab with retries
