@@ -7,6 +7,9 @@ Whether you're a seasoned developer or just getting started, you'll find somethi
 Feel free to contribute, suggest changes, or add your own spin to any of the scripts.
 We're all on this coding journey together, and your input is valuable.
 
+# to install 
+click on the script you want to use click raw then install simple
+
 ## Connect with Me
 
 - Join the conversation on [Discord](https://discord.gg/HJJqRZpH2D) for discussions, questions, and collaboration.
