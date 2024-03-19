@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         Link Extractor
+// @name         skip paster.so spam wait time
 // @namespace    http://tampermonkey.net/
 // @version      0.1
-// @description  Extract links from script tags and display them with a modern blue gradient design.
-// @author       Your Name
+// @description  Skip wait time no more spam check
+// @author       skyline1
 // @match        https://paster.so/*
 // @grant        none
 // ==/UserScript==
